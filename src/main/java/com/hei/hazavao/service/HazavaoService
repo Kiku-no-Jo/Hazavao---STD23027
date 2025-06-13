@@ -9,9 +9,7 @@ import java.util.*;
 
 @Service
 public class HazavaoService {
-
-    @Value("${openai.api.key}")
-    private String openaiApiKey;
+    private static final String OPENAI_API_KEY = "dummy api_key";
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -20,7 +18,7 @@ public class HazavaoService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(openaiApiKey);
+        headers.setBearerAuth(OPENAI_API_KEY);
 
         Map<String, Object> message = new HashMap<>();
         message.put("role", "user");
@@ -32,18 +30,23 @@ public class HazavaoService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(
-                "https://api.openai.com/v1/chat/completions",
-                entity,
-                Map.class
-        );
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    "https://api.openai.com/v1/chat/completions",
+                    entity,
+                    Map.class
+            );
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
-            if (choices != null && !choices.isEmpty()) {
-                Map<String, Object> messageMap = (Map<String, Object>) choices.get(0).get("message");
-                return messageMap.get("content").toString().trim();
+            if (response.getStatusCode() == HttpStatus.OK) {
+                List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
+                if (choices != null && !choices.isEmpty()) {
+                    Map<String, Object> messageMap = (Map<String, Object>) choices.get(0).get("message");
+                    return messageMap.get("content").toString().trim();
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Nisy olana tamin'ny fangatahana: " + e.getMessage();
         }
 
         return "Tsy afaka namaly ny fangatahana.";
