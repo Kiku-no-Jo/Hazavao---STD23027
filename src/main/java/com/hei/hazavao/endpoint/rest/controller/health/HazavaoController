@@ -1,6 +1,6 @@
-package com.example.hazavao.controller;
+package com.hei.hazavao.endpoint.rest.controller.health;
 
-import com.example.hazavao.service.HazavaoService;
+import com.hei.hazavao.endpoint.HazavaoService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
